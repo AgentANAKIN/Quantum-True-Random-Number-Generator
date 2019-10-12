@@ -32,9 +32,7 @@ def qquniform(min, max):
 def qmeasure(hardware):
     if (hardware == 'real'):
         qubits = 14
-        IBMQ.load_account()
-        IBMQ.providers()
-        provider = IBMQ.get_provider(group='open')
+        provider = IBMQ.get_provider(hub='ibm-q')
         provider.backends()
         backend = provider.get_backend('ibmq_16_melbourne')
     else:
@@ -51,13 +49,18 @@ def qmeasure(hardware):
         i = i + 1
    
     qc.measure(q, c) # collapse the superpositions and get random zeroes and ones
-    job = execute(qc, backend=backend, shots=1, memory=True)
+    job = execute(qc, backend, shots=1)
     job_monitor(job)
     result = job.result()
-    mraw = result.get_memory(qc)
+    mraw = result.get_counts(qc)
     m = str(mraw)
     subtotal = 0
     for i in range(qubits):
         subtotal = subtotal + (int(m[i+2]) * 2**(i)) # convert each binary digit to its decimal value, but read left-to-right for simplicity
     multiplier = subtotal / (2**qubits) # convert the measurement to a value between 0 and 1
     return multiplier
+
+print(qrandint(-100, 100))
+print(quniform(-1, 1))
+print(qqrandint(-100, 100))
+print(qquniform(-1, 1))
